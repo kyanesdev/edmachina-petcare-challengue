@@ -1,5 +1,7 @@
 # edmachina-petcare-challengue
 
+VERSION NODE: 18.17.0
+
 ## Project setup
 ```
 npm install
