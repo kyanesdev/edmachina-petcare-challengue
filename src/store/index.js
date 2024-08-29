@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
+import bcrypt from 'bcryptjs'
 
 Vue.use(Vuex)
 
@@ -19,62 +20,57 @@ export default new Vuex.Store({
     },
     ADD_USER (state, user) {
       state.users.push(user)
-    },
-    SET_PETS (state, pets) {
-      state.pets = pets
-    },
-    SET_WIDGETS (state, widgets) {
-      state.widgets = widgets
-    },
-    SET_VACCINATIONS (state, vaccinations) {
-      state.vaccinations = vaccinations
-    },
-    SET_HEALTH_DATA (state, healthData) {
-      state.healthData = healthData
     }
   },
   actions: {
-    registerUser ({ commit, state }, { username, password }) {
+    async registerUser ({ commit, state }, { username, password }) {
       const userExists = state.users.some(user => user.username === username)
       if (userExists) {
         return Promise.reject(new Error('El usuario ya existe'))
       }
-      const newUser = { username, password }
+      const hashedPassword = await bcrypt.hash(password, 10)
+      const recoveryCodes = [
+        Math.random().toString(36).substr(2, 8),
+        Math.random().toString(36).substr(2, 8),
+        Math.random().toString(36).substr(2, 8)
+      ]
+      const newUser = { username, password: hashedPassword, recoveryCodes }
       commit('ADD_USER', newUser)
       return Promise.resolve(newUser)
     },
-    loginUser ({ commit, state }, { username, password }) {
-      const user = state.users.find(
-        user => user.username === username && user.password === password
-      )
+    async loginUser ({ commit, state }, { username, password }) {
+      const user = state.users.find(user => user.username === username)
       if (user) {
-        commit('SET_USER', user)
-        return Promise.resolve(user)
+        const passwordMatch = await bcrypt.compare(password, user.password)
+        if (passwordMatch) {
+          commit('SET_USER', user)
+          return Promise.resolve(user)
+        } else {
+          return Promise.reject(new Error('Usuario o contraseña incorrectos'))
+        }
       } else {
         return Promise.reject(new Error('Usuario o contraseña incorrectos'))
       }
     },
-    fetchPets ({ commit }) {
-      const pets = []
-      commit('SET_PETS', pets)
-    },
-    updateWidgets ({ commit }, widgets) {
-      commit('SET_WIDGETS', widgets)
-    },
-    fetchVaccinations ({ commit }) {
-      const vaccinations = []
-      commit('SET_VACCINATIONS', vaccinations)
-    },
-    updateHealthData ({ commit }, healthData) {
-      commit('SET_HEALTH_DATA', healthData)
+    async resetPassword ({ commit, state }, { username, recoveryCode, newPassword }) {
+      const user = state.users.find(user => user.username === username)
+      if (user && user.recoveryCodes.includes(recoveryCode)) {
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+        user.password = hashedPassword
+        user.recoveryCodes = [
+          Math.random().toString(36).substr(2, 8),
+          Math.random().toString(36).substr(2, 8),
+          Math.random().toString(36).substr(2, 8)
+        ]
+        commit('SET_USER', user)
+        return Promise.resolve(user)
+      } else {
+        return Promise.reject(new Error('Código de recuperación incorrecto'))
+      }
     }
   },
   getters: {
-    isAuthenticated: state => !!state.user,
-    getPets: state => state.pets,
-    getWidgets: state => state.widgets,
-    getVaccinations: state => state.vaccinations,
-    getHealthData: state => state.healthData
+    isAuthenticated: state => !!state.user
   },
   plugins: [createPersistedState()]
 })

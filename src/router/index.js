@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import LoginView from '@/views/LoginView.vue'
 import DashboardView from '@/views/DashboardView.vue'
+import BuildingView from '@/views/BuildingView.vue'
 import store from '@/store'
 
 Vue.use(VueRouter)
@@ -17,7 +18,13 @@ const routes = [
     name: 'dashboard',
     component: DashboardView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/building',
+    name: 'building',
+    component: BuildingView
   }
+
 ]
 
 const router = new VueRouter({

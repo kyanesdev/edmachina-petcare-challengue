@@ -68,6 +68,53 @@
           ></p-button>
         </div>
       </p-dialog>
+      <li>
+        <a class="text-link" @click="showResetPasswordDialog = true">¿Olvidaste tu contraseña?</a>
+      </li>
+      <p-dialog :visible.sync="showResetPasswordDialog" modal :closable="false">
+        <h2 class="login-title">Restablecer contraseña</h2>
+        <div class="flex items-center gap-4 mb-4">
+          <p-input-text
+            class="login-input"
+            type="text"
+            placeholder="Usuario"
+            v-model="resetUsername"
+          />
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <p-input-text
+            class="login-input"
+            type="text"
+            placeholder="Código de recuperación"
+            v-model="recoveryCode"
+          />
+        </div>
+        <div class="flex items-center gap-4 mb-8">
+          <p-password
+            class="login-input"
+            type="password"
+            placeholder="Nueva contraseña"
+            v-model="newPassword"
+            toggleMask
+            :feedback="false"
+          />
+        </div>
+        <div class="registerContainerButtons">
+          <p-button
+            type="button"
+            label="Cancelar"
+            severity="secondary"
+            class="cancelarRegistro"
+            @click="showResetPasswordDialog = false; clearVariables(); clearResetPasswordFields()"
+          />
+          <p-button
+            type="button"
+            label="Restablecer"
+            class="guardarRegistro"
+            @click="resetPassword"
+          />
+        </div>
+      </p-dialog>
     </div>
   </div>
 </template>
@@ -97,7 +144,11 @@ export default {
       passwordLogin: '',
       usernameRegister: '',
       passwordRegister: '',
-      visible: null
+      visible: null,
+      showResetPasswordDialog: false,
+      resetUsername: '',
+      recoveryCode: '',
+      newPassword: ''
     }
   },
   created () {
@@ -107,14 +158,22 @@ export default {
     ...mapActions(['registerUser', 'loginUser']),
     register () {
       const { usernameRegister, passwordRegister } = this
-      this.registerUser({ username: usernameRegister, password: passwordRegister })
-        .then(() => {
+      this.$store.dispatch('registerUser', { username: usernameRegister, password: passwordRegister })
+        .then((newUser) => {
           Swal.fire({
             icon: 'success',
             title: 'Registro exitoso',
-            text: 'Usuario registrado correctamente'
+            html: `
+          <p>Usuario registrado correctamente.</p>
+          <p><strong>Códigos de recuperación:</strong></p>
+          <ul>
+            ${newUser.recoveryCodes.map(code => `<li>${code}</li>`).join('')}
+          </ul>
+          <p><em>Guarda estos códigos en un lugar seguro.</em></p>
+        `
           })
           this.visible = false
+          this.clearVariables()
         })
         .catch(err => {
           Swal.fire({
@@ -155,6 +214,37 @@ export default {
       this.passwordLogin = ''
       this.usernameRegister = ''
       this.passwordRegister = ''
+    },
+    resetPassword () {
+      const { resetUsername, recoveryCode, newPassword } = this
+      this.$store.dispatch('resetPassword', {
+        username: resetUsername,
+        recoveryCode,
+        newPassword
+      })
+        .then(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Contraseña restablecida',
+            text: 'Tu contraseña ha sido actualizada',
+            showConfirmButton: false,
+            timer: 1500
+          })
+          this.showResetPasswordDialog = false
+          this.clearResetPasswordFields()
+        })
+        .catch(err => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: err.message
+          })
+        })
+    },
+    clearResetPasswordFields () {
+      this.resetUsername = ''
+      this.recoveryCode = ''
+      this.newPassword = ''
     }
   }
 }
@@ -200,6 +290,24 @@ export default {
   margin: auto;
   margin-top: 3px;
   background-color: #007bff;
+}
+
+.forgot-password-button {
+  width: 50%;
+  display: flex;
+  margin: auto;
+  margin-top: 3px;
+  background-color: #007bff;
+}
+
+.text-link {
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+li {
+  margin-top: 0.5rem;
+  list-style-type: none;
 }
 
 .registerContainerButtons {
