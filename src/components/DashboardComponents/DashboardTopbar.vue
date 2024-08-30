@@ -1,6 +1,9 @@
 <template>
   <div class="topbar">
-    <p-inputText placeholder="Search..." class="searchBar" />
+    <span class="relative">
+      <i class="mdi mdi-magnify iconBar" ></i>
+      <p-inputText v-model="value1" placeholder="Search" class="searchBar" />
+    </span>
     <p-badge value="2" severity="danger" class="mdi mdi-help-circle-outline iconHelp" />
     <p-badge value="2" severity="danger" class="mdi mdi-bell-outline iconBell" />
     <p-button label="Add widget" class="ml-auto" />
@@ -17,6 +20,11 @@ export default {
     'p-inputText': InputText,
     'p-button': Button,
     'p-badge': badge
+  },
+  data () {
+    return {
+      value1: ''
+    }
   }
 }
 </script>
@@ -31,13 +39,25 @@ export default {
 .ml-auto {
   margin-left: auto;
 }
-.searchBar {
-  width: 60%;
-}
 .iconHelp {
-  margin-left: 42vh;
+  margin-left: 39vh;
 }
 .iconBell {
-  margin-left: 1vh;
+  margin-left: 2vh;
+}
+.relative {
+  position: relative;
+}
+.iconBar {
+  position: absolute;
+  top: 50%;
+  margin-top: -0.55rem;
+  left: -2.1rem;
+  width: 10vh;
+  color: #9e9e9e;
+}
+.searchBar {
+  padding-left: 25px;
+  width: 90vh;
 }
 </style>

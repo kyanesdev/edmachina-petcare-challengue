@@ -1,6 +1,7 @@
 <template>
-  <div class="card flex justify-center">
+  <div class="card flex justify-center position-relative">
     <p-chart type="doughnut" :data="chartData" :options="chartOptions" />
+    <span class="chart-value">{{ value }}%</span>
   </div>
 </template>
 
@@ -36,7 +37,8 @@ export default {
           {
             data: [this.value, 100 - this.value],
             backgroundColor: [this.color, '#E0E0E0'],
-            hoverBackgroundColor: [this.color, '#CCCCCC']
+            hoverBackgroundColor: [this.color, '#CCCCCC'],
+            borderWidth: 0
           }
         ]
       }
@@ -45,10 +47,10 @@ export default {
       return {
         plugins: {
           legend: {
-            display: true
+            display: false
           },
-          doughnutInnerText: {
-            espnVal: 'My Text'
+          tooltip: {
+            enabled: false
           }
         },
         cutout: '80%'
@@ -62,9 +64,17 @@ export default {
 </script>
 
 <style scoped>
-.progress-circle {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.position-relative {
+  position: relative;
+}
+
+.chart-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #000;
 }
 </style>

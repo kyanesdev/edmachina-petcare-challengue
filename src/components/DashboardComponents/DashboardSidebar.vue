@@ -6,8 +6,7 @@
     </div>
     <p-menu :model="items" class="menu">
       <template #item="{ item, props }">
-        <a v-ripple class="flex align-items-center" v-bind="props.action">
-          <span class="ml-2">{{ item.label }}</span>
+        <a v-ripple class="flex items-center" v-bind="props.action">
           <p-badge v-if="item.badge" class="ml-auto" :value="item.badge" />
         </a>
       </template>
@@ -122,7 +121,7 @@ export default {
   background-color: #f8f9fa;
   padding: 20px;
   border-right: 1px solid #e5e7eb;
-  height: 100vh; /* Aumenta la altura del sidebar */
+  height: 100vh;
 }
 
 .logo-section {
@@ -142,7 +141,7 @@ export default {
 .logo-text {
   font-size: 18px;
   font-weight: bold;
-  color: #1d4ed8;
+  color: #0B1C33;
 }
 
 .menu {
@@ -196,5 +195,13 @@ export default {
   height: 1px;
   background-color: #e5e7eb;
   margin: 10px 0;
+}
+
+.menu .p-menuitem-link.logout {
+  color: #E53761 !important;
+}
+
+.menu .p-menuitem-link.logout .mdi {
+  color: #E53761 !important;
 }
 </style>
