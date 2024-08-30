@@ -43,6 +43,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-vue": "^7.20.0",
+    "gh-pages": "^6.1.1",
     "jest": "^27.0.5",
     "vue-template-compiler": "^2.6.14"
   }
